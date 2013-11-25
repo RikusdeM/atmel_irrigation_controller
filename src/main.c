@@ -122,6 +122,7 @@
 #define SECS_NETWORK_INACTIVE_TRIGGER                   (config.report_home_period_secs * 3)
 
 #define DUMMY_WRITE                                     "at+awtda=a,\"ICA_1\",1021099"
+#define DUMMY                                           "at+awtda=a,\"ICA_1\","
 
 char temp_string [40];
 
@@ -1454,7 +1455,33 @@ void clear_temp_string(int size, char* temp_buf)
     }
 }//clear_temp_string
 
+void ack_job(int job_no)
+{
+    char ack [60];
+    strcpy(ack, DUMMY);
+    strcat(ack, job_no);
+    MODEM_raw_puts(ack);
+    MODEM_raw_putb('\n');
+    MODEM_raw_putb('\r');
 
+    return 0;
+}
+
+void decode(char* serial_in)
+{
+    int delimiters_array [] = {0, 0, 0, 0, 0, 0, 0};
+    int pos = 0;
+    char* token = strtok(serial_in, ": ,");
+
+    while (token != NULL) {
+        token = strtok(NULL, ",");
+        if (pos == 1) { //check job_no
+            ack_job(token);
+        }
+        pos++;
+    }
+    return 0;
+}
 
 int main(void)
 {
@@ -1507,8 +1534,10 @@ int main(void)
                 _DEBUG_putc('\n');
                 _DEBUG_putc('\r');
                 delay_s(1.5);
+                decode(unsolicited_command_ptr); //testing
             }
             clear_temp_string(sizeof(unsolicited_command_ptr), unsolicited_command_ptr);
         }
     }//while(1)
+    return 0;
 }//main
