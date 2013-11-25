@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FdkManifest>
+  <Identifier Id="a89ddc0c-42ea-4243-ac40-2add9a09709a">
+    <Name>Firmware Project</Name>
+    <Author>Company Name</Author>
+    <Org>CN</Org>
+    <Version>1.0.0</Version>
+    <ShortName>FP</ShortName>
+    <Description xml:space="preserve">Description of the main features. Mention also the supported part number(s), the board it is running on and the compiler it supports</Description>
+    <License>License.txt</License>
+    <MoreInfoUrl></MoreInfoUrl>
+    <GettingStartedGuide></GettingStartedGuide>
+    <Documentation></Documentation>
+    <Icon></Icon>
+    <PreviewImage></PreviewImage>
+    <InstalledByMsi>false</InstalledByMsi>
+    <Technologies></Technologies>
+    <Categories></Categories>
+    <Kits></Kits>
+    <SupportedProducts>
+      <IsolatedShell Version="6.1">AtmelStudio</IsolatedShell>
+    </SupportedProducts>
+    <AllUsers>false</AllUsers>
+  </Identifier>
+</FdkManifest>
+<!---->
