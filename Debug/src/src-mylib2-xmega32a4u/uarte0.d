@@ -47,14 +47,14 @@ src/src-mylib2-xmega32a4u/uarte0.d src/src-mylib2-xmega32a4u/uarte0.o: \
  ../src/ASF/common/services/ioport/xmega/ioport_compat.h \
  ../src/ASF/common/services/ioport/xmega/../ioport.h \
  ../src/ASF/xmega/drivers/nvm/nvm.h ../src/ASF/xmega/drivers/pmic/pmic.h \
- ../src/ASF/xmega/drivers/rtc/rtc.h ../src/config/conf_rtc.h \
- ../src/ASF/xmega/drivers/sleep/sleep.h \
- c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/sleep.h \
+ ../src/ASF/xmega/services/pwm/pwm.h ../src/ASF/xmega/drivers/tc/tc.h \
+ ../src/ASF/xmega/utils/status_codes.h \
  ../src/ASF/common/services/sleepmgr/sleepmgr.h \
  ../src/ASF/common/services/sleepmgr/xmega/sleepmgr.h \
- ../src/config/conf_sleepmgr.h \
+ ../src/config/conf_sleepmgr.h ../src/ASF/xmega/drivers/sleep/sleep.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/sleep.h \
+ ../src/ASF/xmega/drivers/rtc/rtc.h ../src/config/conf_rtc.h \
  ../src/ASF/common/services/sleepmgr/xmega/sleepmgr.h \
- ../src/ASF/xmega/drivers/tc/tc.h ../src/ASF/xmega/utils/status_codes.h \
  ../src/ASF/common/services/twi/twi_master.h \
  ../src/ASF/common/services/twi/xmega_twi/twi_master.h \
  ../src/ASF/xmega/drivers/twi/twim.h ../src/config/conf_twim.h \
@@ -173,13 +173,11 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8
 
 ../src/ASF/xmega/drivers/pmic/pmic.h:
 
-../src/ASF/xmega/drivers/rtc/rtc.h:
+../src/ASF/xmega/services/pwm/pwm.h:
 
-../src/config/conf_rtc.h:
+../src/ASF/xmega/drivers/tc/tc.h:
 
-../src/ASF/xmega/drivers/sleep/sleep.h:
-
-c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/sleep.h:
+../src/ASF/xmega/utils/status_codes.h:
 
 ../src/ASF/common/services/sleepmgr/sleepmgr.h:
 
@@ -187,11 +185,15 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8
 
 ../src/config/conf_sleepmgr.h:
 
+../src/ASF/xmega/drivers/sleep/sleep.h:
+
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/sleep.h:
+
+../src/ASF/xmega/drivers/rtc/rtc.h:
+
+../src/config/conf_rtc.h:
+
 ../src/ASF/common/services/sleepmgr/xmega/sleepmgr.h:
-
-../src/ASF/xmega/drivers/tc/tc.h:
-
-../src/ASF/xmega/utils/status_codes.h:
 
 ../src/ASF/common/services/twi/twi_master.h:
 

@@ -5,11 +5,11 @@
  *
  */
 
- /* This file is intended to contain definitions and configuration details for
- * features and devices that are available on the board, e.g., frequency and
- * startup time for an external crystal, external memory devices, LED and USART
- * pins.
- */
+/* This file is intended to contain definitions and configuration details for
+* features and devices that are available on the board, e.g., frequency and
+* startup time for an external crystal, external memory devices, LED and USART
+* pins.
+*/
 
 #ifndef USER_BOARD_H
 #define USER_BOARD_H
@@ -35,51 +35,51 @@
 
 // ************************************************************************
 
-#define UART_NONE			0
-#define UARTC1				1
-#define UARTE0				2
+#define UART_NONE           0
+#define UARTC1              1
+#define UARTE0              2
 
-#define DEBUG_UART			UARTC1
-#define MODEM_UART			UARTE0
+#define DEBUG_UART          UARTC1
+#define MODEM_UART          UARTE0
 
 #if DEBUG_UART == UARTC1 || MODEM_UART == UARTC1
-#define ENABLE_UARTC1		1
+#define ENABLE_UARTC1       1
 #else
-#define ENABLE_UARTC1		0
+#define ENABLE_UARTC1       0
 #endif
 
 #if DEBUG_UART == UARTE0 || MODEM_UART == UARTE0
-#define ENABLE_UARTE0		1
+#define ENABLE_UARTE0       1
 #else
-#define ENABLE_UARTC1		0
+#define ENABLE_UARTC1       0
 #endif
 
 // ************************************************************************
 
-#define GPIO_COUNT4			IOPORT_CREATE_PIN(PORTA,2)
-#define GPIO_X1				IOPORT_CREATE_PIN(PORTA,3)
+#define GPIO_COUNT4         IOPORT_CREATE_PIN(PORTA,2)
+#define GPIO_X1             IOPORT_CREATE_PIN(PORTA,3)
 #define GPIO_LED2           IOPORT_CREATE_PIN(PORTA,5)
-#define GPIO_X3				IOPORT_CREATE_PIN(PORTA,6)
+#define GPIO_X3             IOPORT_CREATE_PIN(PORTA,6)
 
 #define GPIO_SL_WDOG        IOPORT_CREATE_PIN(PORTB,1)
-#define GPIO_COUNT3			IOPORT_CREATE_PIN(PORTB,2)
+#define GPIO_COUNT3         IOPORT_CREATE_PIN(PORTB,2)
 #define GPIO_LED1           IOPORT_CREATE_PIN(PORTB,3)
 
-#define GPIO_COUNT1			IOPORT_CREATE_PIN(PORTC,2)
+#define GPIO_COUNT1         IOPORT_CREATE_PIN(PORTC,2)
 #if ENABLE_UARTC1 == 1
 #define GPIO_USARTC1_RXD1   IOPORT_CREATE_PIN(PORTC,6)
 #define GPIO_USARTC1_TXD1   IOPORT_CREATE_PIN(PORTC,7)
 #else
-#define GPIO_COUNT5			IOPORT_CREATE_PIN(PORTC,6)
-#define GPIO_COUNT6			IOPORT_CREATE_PIN(PORTC,7)
+#define GPIO_COUNT5         IOPORT_CREATE_PIN(PORTC,6)
+#define GPIO_COUNT6         IOPORT_CREATE_PIN(PORTC,7)
 #endif
 
 #define GPIO_EXT_OP1        IOPORT_CREATE_PIN(PORTD,0)
 #define GPIO_EXT_OP2        IOPORT_CREATE_PIN(PORTD,1)
-#define GPIO_COUNT2			IOPORT_CREATE_PIN(PORTD,2)
+#define GPIO_COUNT2         IOPORT_CREATE_PIN(PORTD,2)
 #define GPIO_EXT_OP3        IOPORT_CREATE_PIN(PORTD,3)
 
-#define GPIO_POWER			GPIO_EXT_OP3
+#define GPIO_POWER          GPIO_EXT_OP3
 
 
 #if ENABLE_UARTE0 == 1

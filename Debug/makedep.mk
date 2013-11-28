@@ -48,6 +48,8 @@ src\ASF\xmega\drivers\usart\usart.c
 
 src\ASF\xmega\drivers\wdt\wdt.c
 
+src\ASF\xmega\services\pwm\pwm.c
+
 src\ASF\xmega\services\timeout\timeout.c
 
 src\main.c

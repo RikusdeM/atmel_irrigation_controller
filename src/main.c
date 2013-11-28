@@ -121,10 +121,21 @@
 
 #define SECS_NETWORK_INACTIVE_TRIGGER                   (config.report_home_period_secs * 3)
 
-#define DUMMY_WRITE                                     "at+awtda=a,\"ICA_1\",1021099"
-#define DUMMY                                           "at+awtda=a,\"ICA_1\","
+#define DUMMY_WRITE                                     "at+awtda=a,\"ICA1\",1021099"
+#define DUMMY                                           "at+awtda=a,\"ICA1\","
 
 char temp_string [40];
+
+
+typedef struct _asset_model {
+    char job_type;
+    int32_t job_id;
+    char* asset_id;
+    char* job_desc;
+    char* data_type;
+    int32_t job_value;
+    char* crc;
+} asset_model;
 
 
 typedef struct _config_0x02_t {
@@ -1463,24 +1474,127 @@ void ack_job(int job_no)
     MODEM_raw_puts(ack);
     MODEM_raw_putb('\n');
     MODEM_raw_putb('\r');
+    delay_s(1.5);
 
     return 0;
 }
 
-void decode(char* serial_in)
+void pwm_toggle(bool on, int duty, int frequency)
+{
+    struct pwm_config pwm_cfg;
+    pwm_init(&pwm_cfg, PWM_TCD0, PWM_CH_A, frequency); //frequency
+    if (on == true) {
+        pwm_start(&pwm_cfg, duty); //duty
+    } else {
+        pwm_stop(&pwm_cfg);
+    }
+
+    return 0;
+}
+
+asset_model* decode(char* serial_in)
 {
     int delimiters_array [] = {0, 0, 0, 0, 0, 0, 0};
     int pos = 0;
     char* token = strtok(serial_in, ": ,");
+    asset_model model;
 
     while (token != NULL) {
         token = strtok(NULL, ",");
-        if (pos == 1) { //check job_no
+        switch (pos) {
+        case 0:
+            model.job_type = token;
+            break;
+        case 1:
             ack_job(token);
+            model.job_id = (int32_t) token;
+            break;
+        case 2:
+            model.asset_id = token;
+            break;
+        case 3:
+            model.job_desc = token;
+            break;
+        case 4:
+            model.data_type = token;
+            break;
+        case 5:
+            model.job_value = (int32_t) token;
+            break;
+        case 6:
+            model.crc = token;
+            break;
         }
         pos++;
     }
+    return &model; //return address of the model struct
+}
+
+void schedule_job(asset_model* model)
+{
+    /*
+    char buffer [40];
+    strcpy(buffer, model->job_value);
+    DEBUG_puts("type: ");
+    DEBUG_puts(buffer);
+    DEBUG_puts("\n \r");
+    nvm_eeprom_write_byte(0x0000, 101);
+    */
+    int count = 0;
+    int address_count = 0x0000;
+    char job_value_buffer[15];
+
+    if (strcmp(model->asset_id, "ICA1") == 0) { //this methods does work for string comparing , change the rest to also utilize strcmp!!!
+        DEBUG_puts("jooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+        if (model->job_desc == "TV_ts0") {
+            strcpy(job_value_buffer, model->job_value);
+            DEBUG_puts("jooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+            while (job_value_buffer[count] != NULL) {
+                nvm_eeprom_write_byte(address_count, job_value_buffer[count]);
+                count++;
+                address_count++;
+            }
+            count = 0;
+        }
+        if (model->job_desc == "TV_ts1") {
+            address_count = 0x0010;
+            strcpy(job_value_buffer, model->job_value);
+            while (job_value_buffer[count] != NULL) {
+                nvm_eeprom_write_byte(address_count, job_value_buffer[count]);
+                count++;
+                address_count++;
+            }
+            count = 0;
+        }
+        if (model->job_desc == "TV_ts2") {
+            address_count = 0x0020;
+            strcpy(job_value_buffer, model->job_value);
+            while (job_value_buffer[count] != NULL) {
+                nvm_eeprom_write_byte(address_count, job_value_buffer[count]);
+                count++;
+                address_count++;
+            }
+            count = 0;
+        }
+    }
+
     return 0;
+}
+
+void print_eeprom(void)
+{
+    int addr = 0x0000;
+    DEBUG_puts("eeprom : ");
+    DEBUG_putb(nvm_eeprom_read_byte(addr));
+    DEBUG_puts("\n \r");
+    /*
+    for (int address = 0; address < 50; address++) {
+        DEBUG_puts((char) nvm_eeprom_read_byte(addr + address));
+        DEBUG_puts("\n \r");
+    }
+    */
+
+
 }
 
 int main(void)
@@ -1495,7 +1609,6 @@ int main(void)
     rtc_init();
     cpu_irq_enable();
     delay_init(F_CPU);
-
 
     ioport_set_pin_low(GPIO_LED1);
     _DEBUG_init();
@@ -1517,6 +1630,14 @@ int main(void)
 
     loop_time_start = rtc_get_time();
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////test
+    /*
+    pwm_toggle(true, 50, 10);
+    delay_s(5);
+    pwm_toggle(false, 0, 0);
+    nvm_eeprom_write_byte(0x0001, 101);
+    */
+
     while (1) {
         if ((rtc_get_time() - loop_time_start) >= 4) {
             MODEM_raw_puts(DUMMY_WRITE);
@@ -1534,7 +1655,9 @@ int main(void)
                 _DEBUG_putc('\n');
                 _DEBUG_putc('\r');
                 delay_s(1.5);
-                decode(unsolicited_command_ptr); //testing
+                asset_model* model_ptr = decode(unsolicited_command_ptr);
+                schedule_job(model_ptr);
+                print_eeprom();
             }
             clear_temp_string(sizeof(unsolicited_command_ptr), unsolicited_command_ptr);
         }
