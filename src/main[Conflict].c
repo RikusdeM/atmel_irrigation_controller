@@ -1700,111 +1700,76 @@ void print_eeprom(void)
     return 0;
 }
 
-void int_to_binary(int32_t k, int8_t bin_array[32])
+void execute_jobs(char* scheduled_char_time_ptr)
 {
-    int8_t count = 0;
-    int32_t value = k;
-    DEBUG_puts("k : ");
-    DEBUG_putu(k);
-    DEBUG_puts("\n \r");
-    while (value != 0 && value != 1) {
-        bin_array[count] = k % 2;
-        count++;
-        value = k / 2 ;
-        k = value;
-        if (value == 1) {
-            bin_array[count] = 1;
-            count++;
+    int8_t decimal_pos = 0;
+    int32_t total_value = 0;
+    bool negative_value = false; //must still implement negative value logic, scheduled_char_time_ptr also has to be reversed to correctly apply bit manipulation
+    for (int x = 0; x < strlen(scheduled_char_time_ptr); x++) {
+        if (scheduled_char_time_ptr[x] == '-') {
+            negative_value = true;
         }
-    }
-    return 0;
-}//int_to_binary
-
-void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
-{
-    int32_t job_value = 0;
-    int8_t array_pos = 0;
-    int8_t bin_array_pass [32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    for (int x = (size - 1); x >= 0; x--) {
-        if ((Byte)(scheduled_char_time_ptr) != 0xFF) {
-            int32_t char_byte = (int32_t)(scheduled_char_time_ptr[x] - '0');
-            switch (array_pos) {
-            case 0 : {
-                job_value = job_value + char_byte;
+        if ((Byte)(scheduled_char_time_ptr[x]) != 255) {
+            int8_t value = (int8_t)(scheduled_char_time_ptr[x] - '0');
+            switch (decimal_pos) {
+            case 0: {
+                total_value = total_value + value;
                 break;
             }
             case 1: {
-                job_value = job_value + 10 * char_byte;
+                total_value = total_value + 10 * value;
                 break;
             }
             case 2: {
-                job_value = job_value + 100 * char_byte;
+                total_value = total_value + 100 * value;
                 break;
             }
             case 3: {
-                job_value = job_value + 1000 * char_byte;
+                total_value = total_value + 1000 * value;
                 break;
             }
             case 4: {
-                job_value = job_value + 10000 * char_byte;
+                total_value = total_value + 10000 * value;
                 break;
             }
             case 5: {
-                job_value = job_value + 100000 * char_byte;
+                total_value = total_value + 100000 * value;
                 break;
             }
             case 6: {
-                job_value = job_value + 1000000 * char_byte;
+                total_value = total_value + 1000000 * value;
                 break;
             }
             case 7: {
-                job_value = job_value + 10000000 * char_byte;
+                total_value = total_value + 10000000 * value;
                 break;
             }
             case 8: {
-                job_value = job_value + 100000000 * char_byte;
+                total_value = total_value + 100000000 * value;
                 break;
             }
             case 9: {
-                job_value = job_value + 1000000000 * char_byte;
+                total_value = total_value + 1000000000 * value;
                 break;
             }
-            case 10: {
-                job_value = job_value + 10000000000 * char_byte;
-                break;
+
             }
-            }//switch
-            array_pos++;
-        }//if
+            decimal_pos++;
+        } //byte != 255 (must also check for negative number when number has wrapped)
     }//for
-    DEBUG_puts("job_value : ");
-    DEBUG_putu(job_value);
+    DEBUG_puts("char value[0] : ");
+    _DEBUG_putc(scheduled_char_time_ptr[0]);
     DEBUG_puts("\n \r");
-    int_to_binary(job_value, bin_array_pass);
-    //calculate times that have been set by analyzing bin_array_pass(remember to check relavent asset and timeslots to ensure that corret times are represented)
-    //check asset and timeslot at hand and pass the binary array for each timeslot with the relevant offset (use switch statement) to the pwm method
-    //check bin values for set jobs and trigger when necessary
-    DEBUG_puts(asset);
+    DEBUG_puts("total_value : ");
+    DEBUG_putu(total_value);
     DEBUG_puts("\n \r");
-    DEBUG_puts("after int2bin : ");
-    for (int x = 0; x < 32 ; x++) {
-        DEBUG_putu(bin_array_pass[x]);
-    }
-    DEBUG_puts("\n \r");
-    for (int x = 0; x < 32 ; x++) { //clear bin_array_pass
-        bin_array_pass[x] = 0;
-    }
-    DEBUG_puts("\n \r");
-
-
-
 }//execute_jobs
+
 void look_for_jobs(void)
 {
     //check eeprom for scheduled jobs and execute them on the minute
     uint32_t current_time = rtc_get_time();
-    int8_t count = 0;
+    int count = 0;
     static char scheduled_char_time[16];
     char eeprom_char_byte;
     for (int address = 0x0000; address <= 0x008F; address++) { //loop through entire eeprom address range
@@ -1816,7 +1781,8 @@ void look_for_jobs(void)
             }
             if (address == 0x000F) {
                 char* scheduled_char_time_ptr = &scheduled_char_time;
-                execute_jobs(scheduled_char_time_ptr, count, "ICA1_ts0");
+                execute_jobs(scheduled_char_time_ptr);
+                //scheduled_char_time contains the job set time in character format. Have to implement bitmanupulation on the given char values to convert to byte format. minus offset of ascii value.(48 dec of '0') then calculate time intervals that have been set.
                 for (int x = 0; x <= 15; x++) { //clear array
                     scheduled_char_time[x] = (char)(0xFF);
                 }
@@ -1831,7 +1797,7 @@ void look_for_jobs(void)
             }
             if (address == 0x001F) {
                 char* scheduled_char_time_ptr = &scheduled_char_time;
-                execute_jobs(scheduled_char_time_ptr, count, "ICA1_ts1");
+                execute_jobs(scheduled_char_time_ptr);
                 for (int x = 0; x <= 15; x++) { //clear array
                     scheduled_char_time[x] = (char)(0xFF);
                 }
@@ -1846,7 +1812,7 @@ void look_for_jobs(void)
             }
             if (address == 0x002F) {
                 char* scheduled_char_time_ptr = &scheduled_char_time;
-                execute_jobs(scheduled_char_time_ptr, count, "ICA1_ts2");
+                execute_jobs(scheduled_char_time_ptr);
                 for (int x = 0; x <= 15; x++) { //clear array
                     scheduled_char_time[x] = (char)(0xFF);
                 }
@@ -1861,7 +1827,7 @@ void look_for_jobs(void)
             }
             if (address == 0x003F) {
                 char* scheduled_char_time_ptr = &scheduled_char_time;
-                execute_jobs(scheduled_char_time_ptr, count, "ICA2_ts0");
+                execute_jobs(scheduled_char_time_ptr);
                 for (int x = 0; x <= 15; x++) { //clear array
                     scheduled_char_time[x] = (char)(0xFF);
                 }
@@ -1876,7 +1842,7 @@ void look_for_jobs(void)
             }
             if (address == 0x004F) {
                 char* scheduled_char_time_ptr = &scheduled_char_time;
-                execute_jobs(scheduled_char_time_ptr, count, "ICA2_ts1");
+                execute_jobs(scheduled_char_time_ptr);
                 for (int x = 0; x <= 15; x++) { //clear array
                     scheduled_char_time[x] = (char)(0x00FF);
                 }
@@ -1891,7 +1857,7 @@ void look_for_jobs(void)
             }
             if (address == 0x005F) {
                 char* scheduled_char_time_ptr = &scheduled_char_time;
-                execute_jobs(scheduled_char_time_ptr, count, "ICA2_ts2");
+                execute_jobs(scheduled_char_time_ptr);
                 for (int x = 0; x <= 15; x++) { //clear array
                     scheduled_char_time[x] = (char)(0xFF);
                 }
@@ -1906,7 +1872,7 @@ void look_for_jobs(void)
             }
             if (address == 0x006F) {
                 char* scheduled_char_time_ptr = &scheduled_char_time;
-                execute_jobs(scheduled_char_time_ptr, count, "ICA3_ts0");
+                execute_jobs(scheduled_char_time_ptr);
                 for (int x = 0; x <= 15; x++) { //clear array
                     scheduled_char_time[x] = (char)(0xFF);
                 }
@@ -1921,7 +1887,7 @@ void look_for_jobs(void)
             }
             if (address == 0x007F) {
                 char* scheduled_char_time_ptr = &scheduled_char_time;
-                execute_jobs(scheduled_char_time_ptr, count, "ICA3_ts1");
+                execute_jobs(scheduled_char_time_ptr);
                 for (int x = 0; x <= 15; x++) { //clear array
                     scheduled_char_time[x] = (char)(0xFF);
                 }
@@ -1936,7 +1902,7 @@ void look_for_jobs(void)
             }
             if (address == 0x008F) {
                 char* scheduled_char_time_ptr = &scheduled_char_time;
-                execute_jobs(scheduled_char_time_ptr, count, "ICA3_ts2");
+                execute_jobs(scheduled_char_time_ptr);
                 for (int x = 0; x <= 15; x++) { //clear array
                     scheduled_char_time[x] = (char)(0xFF);
                 }
