@@ -1444,6 +1444,85 @@ ISR(PORTA_INT0_vect)    // GPIO_COUNT4
 * ****************************************************************************
 */
 
+void wipe_ica1_eeprom(int8_t timeslot)
+{
+    switch (timeslot) {
+    case 0 : {
+        for (int counter = 0; counter <= 0xF; counter ++) {
+            nvm_eeprom_write_byte(counter, 0xFF);
+        }
+        break;
+    }
+    case 1: {
+        for (int counter = 10 ; counter <= 0x1F; counter ++) {
+            nvm_eeprom_write_byte(counter, 0xFF);
+        }
+        break;
+    }
+
+    case 2: {
+        for (int counter = 20 ; counter <= 0x2F; counter ++) {
+            nvm_eeprom_write_byte(counter, 0xFF);
+        }
+        break;
+    }
+    }//switch
+    return 0;
+}//wipe_ica1_eeprom
+
+void wipe_ica2_eeprom(int8_t timeslot)
+{
+    switch (timeslot) {
+    case 0 : {
+        for (int counter = 30; counter <= 0x3F; counter ++) {
+            nvm_eeprom_write_byte(counter, 0xFF);
+        }
+        break;
+    }
+    case 1: {
+        for (int counter = 40 ; counter <= 0x4F; counter ++) {
+            nvm_eeprom_write_byte(counter, 0xFF);
+        }
+        break;
+    }
+
+    case 2: {
+        for (int counter = 50 ; counter <= 0x5F; counter ++) {
+            nvm_eeprom_write_byte(counter, 0xFF);
+        }
+        break;
+    }
+    }//switch
+    return 0;
+}//wipe_ica2_eeprom
+
+void wipe_ica3_eeprom(int8_t timeslot)
+{
+    switch (timeslot) {
+    case 0 : {
+        for (int counter = 60; counter <= 0x6F; counter ++) {
+            nvm_eeprom_write_byte(counter, 0xFF);
+        }
+        break;
+    }
+    case 1: {
+        for (int counter = 70 ; counter <= 0x7F; counter ++) {
+            nvm_eeprom_write_byte(counter, 0xFF);
+        }
+        break;
+    }
+
+    case 2: {
+        for (int counter = 80 ; counter <= 0x8F; counter ++) {
+            nvm_eeprom_write_byte(counter, 0xFF);
+        }
+        break;
+    }
+    }//switch
+    return 0;
+}//wipe_ica3_eeprom
+
+
 void get_unsolicited_commands(int buf_size, char* buffer)
 {
     char character;
@@ -1613,6 +1692,16 @@ void schedule_job(asset_model* model)
             }
             count = 0;
         }
+        if (strcmp(model->job_desc, "CM_ts0") == 0) {
+            //check int value for confirmation that reset eeprom has been set
+            wipe_ica1_eeprom(0);
+        }
+        if (strcmp(model->job_desc, "CM_ts1") == 0) {
+            wipe_ica1_eeprom(1);
+        }
+        if (strcmp(model->job_desc, "CM_ts2") == 0) {
+            wipe_ica1_eeprom(2);
+        }
     }//ICA1
     if (strcmp(model->asset_id, "ICA2") == 0) {
         if (strcmp(model->job_desc, "TV_ts0") == 0) {
@@ -1648,6 +1737,15 @@ void schedule_job(asset_model* model)
             }
             count = 0;
         }
+        if (strcmp(model->job_desc, "CM_ts0") == 0) {
+            wipe_ica2_eeprom(0);
+        }
+        if (strcmp(model->job_desc, "CM_ts1") == 0) {
+            wipe_ica2_eeprom(1);
+        }
+        if (strcmp(model->job_desc, "CM_ts2") == 0) {
+            wipe_ica2_eeprom(2);
+        }
     }//ICA2
     if (strcmp(model->asset_id, "ICA3") == 0) {
         if (strcmp(model->job_desc, "TV_ts0") == 0) {
@@ -1682,6 +1780,15 @@ void schedule_job(asset_model* model)
                 address_count++;
             }
             count = 0;
+        }
+        if (strcmp(model->job_desc, "CM_ts0") == 0) {
+            wipe_ica3_eeprom(0);
+        }
+        if (strcmp(model->job_desc, "CM_ts1") == 0) {
+            wipe_ica3_eeprom(1);
+        }
+        if (strcmp(model->job_desc, "CM_ts2") == 0) {
+            wipe_ica3_eeprom(2);
         }
     }//ICA3
 
@@ -1720,11 +1827,19 @@ void int_to_binary(int32_t k, int8_t bin_array[32])
     return 0;
 }//int_to_binary
 
+
+
 void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
 {
     int32_t job_value = 0;
     int8_t array_pos = 0;
     int8_t bin_array_pass [32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    uint32_t current_time = rtc_get_time(); //seconds
+    uint32_t start_time = 0; //seconds
+    uint32_t end_time = 0; //seconds
+    uint32_t timeslot_offset = 0;
+    int8_t next_bin_value = 0; // check the next value of the binary array to check if next job has been set to not stop the current job.
+    bool next_job = false;
 
     for (int x = (size - 1); x >= 0; x--) {
         if ((Byte)(scheduled_char_time_ptr) != 0xFF) {
@@ -1778,26 +1893,278 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
             array_pos++;
         }//if
     }//for
-    DEBUG_puts("job_value : ");
-    DEBUG_putu(job_value);
-    DEBUG_puts("\n \r");
     int_to_binary(job_value, bin_array_pass);
-    //calculate times that have been set by analyzing bin_array_pass(remember to check relavent asset and timeslots to ensure that corret times are represented)
-    //check asset and timeslot at hand and pass the binary array for each timeslot with the relevant offset (use switch statement) to the pwm method
-    //check bin values for set jobs and trigger when necessary
-    DEBUG_puts(asset);
-    DEBUG_puts("\n \r");
-    DEBUG_puts("after int2bin : ");
-    for (int x = 0; x < 32 ; x++) {
-        DEBUG_putu(bin_array_pass[x]);
+    current_time = rtc_get_time();
+
+    if (job_value < 0) {
+        uint32_t temp_value = -1 * job_value + 2147483648;
+        job_value = temp_value;
     }
-    DEBUG_puts("\n \r");
+
+    if (asset == "ICA1_ts0") {
+        timeslot_offset = 0;
+        for (int arr_index = 0; arr_index < 32; arr_index ++) {
+            if (bin_array_pass[arr_index] == 1) {
+                start_time = arr_index * (15 * 60) + timeslot_offset;
+                end_time = start_time + (15 * 60);
+                if ((arr_index + 1) <= 31) {
+                    next_bin_value = bin_array_pass[arr_index + 1];
+                    if (next_bin_value == 1) {
+                        next_job = true;
+                    } else {
+                        next_job = false;
+                    }
+                }
+                if (current_time  >= start_time && current_time <= (start_time + 60)) {
+                    //start pwm method
+                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    pwm_toggle(0, true, 10, 10);
+                }
+                if (current_time >= end_time && current_time <= (end_time + 60)) {
+                    if (next_job == false) {
+                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        pwm_toggle(0, false, 0, 0);
+                    }
+                }
+
+            }
+        }
+    }
+    if (asset == "ICA1_ts1") {
+        timeslot_offset = 8 * 60 * 60L;
+        for (int arr_index = 0; arr_index < 32; arr_index ++) {
+            if (bin_array_pass[arr_index] == 1) {
+                start_time = arr_index * (15 * 60) + timeslot_offset;
+                end_time = start_time + (15 * 60);
+                if ((arr_index + 1) <= 31) {
+                    next_bin_value = bin_array_pass[arr_index + 1];
+                    if (next_bin_value == 1) {
+                        next_job = true;
+                    } else {
+                        next_job = false;
+                    }
+                }
+                if (current_time  >= start_time && current_time <= (start_time + 60)) {
+                    //start pwm method
+                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    pwm_toggle(0, true, 10, 10);
+                }
+                if (current_time >= end_time && current_time <= (end_time + 60)) {
+                    if (next_job == false) {
+                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        pwm_toggle(0, false, 0, 0);
+                    }
+                }
+
+            }
+        }
+    }
+    if (asset == "ICA1_ts2") {
+        timeslot_offset = 16 * 60 * 60L; //change to L for all the rest multiplications so that the sum works correctly
+        for (int arr_index = 0; arr_index < 32; arr_index ++) {
+            if (bin_array_pass[arr_index] == 1) {
+                start_time = arr_index * (15 * 60) + timeslot_offset;
+                end_time = start_time + (15 * 60);
+                if ((arr_index + 1) <= 31) {
+                    next_bin_value = bin_array_pass[arr_index + 1];
+                    if (next_bin_value == 1) {
+                        next_job = true;
+                    } else {
+                        next_job = false;
+                    }
+                }
+                if (current_time  >= start_time && current_time <= (start_time + 60)) {
+                    //start pwm method
+                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    pwm_toggle(0, true, 10, 10);
+                }
+                if (current_time >= end_time && current_time <= (end_time + 60)) {
+                    if (next_job == false) {
+                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        pwm_toggle(0, false, 0, 0);
+                    }
+                }
+
+            }
+        }
+    }
+    if (asset == "ICA2_ts0") {
+        timeslot_offset = 0;
+        for (int arr_index = 0; arr_index < 32; arr_index ++) {
+            if (bin_array_pass[arr_index] == 1) {
+                start_time = arr_index * (15 * 60) + timeslot_offset;
+                end_time = start_time + (15 * 60);
+                if ((arr_index + 1) <= 31) {
+                    next_bin_value = bin_array_pass[arr_index + 1];
+                    if (next_bin_value == 1) {
+                        next_job = true;
+                    } else {
+                        next_job = false;
+                    }
+                }
+                if (current_time  >= start_time && current_time <= (start_time + 60)) {
+                    //start pwm method
+                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    pwm_toggle(1, true, 10, 10);
+                }
+                if (current_time >= end_time && current_time <= (end_time + 60)) {
+                    if (next_job == false) {
+                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        pwm_toggle(1, false, 0, 0);
+                    }
+                }
+
+            }
+        }
+    }
+    if (asset == "ICA2_ts1") {
+        timeslot_offset = 8 * 60 * 60L;
+        for (int arr_index = 0; arr_index < 32; arr_index ++) {
+            if (bin_array_pass[arr_index] == 1) {
+                start_time = arr_index * (15 * 60) + timeslot_offset;
+                end_time = start_time + (15 * 60);
+                if ((arr_index + 1) <= 31) {
+                    next_bin_value = bin_array_pass[arr_index + 1];
+                    if (next_bin_value == 1) {
+                        next_job = true;
+                    } else {
+                        next_job = false;
+                    }
+                }
+                if (current_time  >= start_time && current_time <= (start_time + 60)) {
+                    //start pwm method
+                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    pwm_toggle(1, true, 10, 10);
+                }
+                if (current_time >= end_time && current_time <= (end_time + 60)) {
+                    if (next_job == false) {
+                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        pwm_toggle(1, false, 0, 0);
+                    }
+                }
+
+            }
+        }
+    }
+    if (asset == "ICA2_ts2") {
+        timeslot_offset = 16 * 60 * 60L;
+        for (int arr_index = 0; arr_index < 32; arr_index ++) {
+            if (bin_array_pass[arr_index] == 1) {
+                start_time = arr_index * (15 * 60) + timeslot_offset;
+                end_time = start_time + (15 * 60);
+                if ((arr_index + 1) <= 31) {
+                    next_bin_value = bin_array_pass[arr_index + 1];
+                    if (next_bin_value == 1) {
+                        next_job = true;
+                    } else {
+                        next_job = false;
+                    }
+                }
+                if (current_time  >= start_time && current_time <= (start_time + 60)) {
+                    //start pwm method
+                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    pwm_toggle(1, true, 10, 10);
+                }
+                if (current_time >= end_time && current_time <= (end_time + 60)) {
+                    if (next_job == false) {
+                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        pwm_toggle(1, false, 0, 0);
+                    }
+                }
+
+            }
+        }
+    }
+    if (asset == "ICA3_ts0") {
+        timeslot_offset = 0;
+        for (int arr_index = 0; arr_index < 32; arr_index ++) {
+            if (bin_array_pass[arr_index] == 1) {
+                start_time = arr_index * (15 * 60) + timeslot_offset;
+                end_time = start_time + (15 * 60);
+                if ((arr_index + 1) <= 31) {
+                    next_bin_value = bin_array_pass[arr_index + 1];
+                    if (next_bin_value == 1) {
+                        next_job = true;
+                    } else {
+                        next_job = false;
+                    }
+                }
+                if (current_time  >= start_time && current_time <= (start_time + 60)) {
+                    //start pwm method
+                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    pwm_toggle(3, true, 10, 10);
+                }
+                if (current_time >= end_time && current_time <= (end_time + 60)) {
+                    if (next_job == false) {
+                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        pwm_toggle(3, false, 0, 0);
+                    }
+                }
+
+            }
+        }
+    }
+    if (asset == "ICA3_ts1") {
+        timeslot_offset = 8 * 60 * 60L;
+        for (int arr_index = 0; arr_index < 32; arr_index ++) {
+            if (bin_array_pass[arr_index] == 1) {
+                start_time = arr_index * (15 * 60) + timeslot_offset;
+                end_time = start_time + (15 * 60);
+                if ((arr_index + 1) <= 31) {
+                    next_bin_value = bin_array_pass[arr_index + 1];
+                    if (next_bin_value == 1) {
+                        next_job = true;
+                    } else {
+                        next_job = false;
+                    }
+                }
+                if (current_time  >= start_time && current_time <= (start_time + 60)) {
+                    //start pwm method
+                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    pwm_toggle(3, true, 10, 10);
+                }
+                if (current_time >= end_time && current_time <= (end_time + 60)) {
+                    if (next_job == false) {
+                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        pwm_toggle(3, false, 0, 0);
+                    }
+                }
+
+            }
+        }
+    }
+    if (asset == "ICA3_ts2") {
+        timeslot_offset = 16 * 60 * 60L;
+        for (int arr_index = 0; arr_index < 32; arr_index ++) {
+            if (bin_array_pass[arr_index] == 1) {
+                start_time = arr_index * (15 * 60) + timeslot_offset;
+                end_time = start_time + (15 * 60);
+                if ((arr_index + 1) <= 31) {
+                    next_bin_value = bin_array_pass[arr_index + 1];
+                    if (next_bin_value == 1) {
+                        next_job = true;
+                    } else {
+                        next_job = false;
+                    }
+                }
+                if (current_time  >= start_time && current_time <= (start_time + 60)) {
+                    //start pwm method
+                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    pwm_toggle(3, true, 10, 10);
+                }
+                if (current_time >= end_time && current_time <= (end_time + 60)) {
+                    if (next_job == false) {
+                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        pwm_toggle(3, false, 0, 0);
+                    }
+                }
+
+            }
+        }
+    }
     for (int x = 0; x < 32 ; x++) { //clear bin_array_pass
         bin_array_pass[x] = 0;
     }
-    DEBUG_puts("\n \r");
-
-
 
 }//execute_jobs
 void look_for_jobs(void)

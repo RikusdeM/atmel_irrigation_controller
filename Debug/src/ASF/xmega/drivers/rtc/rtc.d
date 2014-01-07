@@ -24,7 +24,7 @@ src/ASF/xmega/drivers/rtc/rtc.d src/ASF/xmega/drivers/rtc/rtc.o: \
  ../src/ASF/xmega/utils/preprocessor/preprocessor.h \
  ../src/ASF/xmega/utils/progmem.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/pgmspace.h \
- ../src/ASF/common/utils/interrupt.h \
+ ../src/ASF/xmega/drivers/tc/interrupt.h \
  ../src/ASF/common/utils/interrupt/interrupt_avr8.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/interrupt.h \
  ../src/ASF/common/services/clock/sysclk.h ../src/config/conf_clock.h \
@@ -92,7 +92,7 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/pgmspace.h:
 
-../src/ASF/common/utils/interrupt.h:
+../src/ASF/xmega/drivers/tc/interrupt.h:
 
 ../src/ASF/common/utils/interrupt/interrupt_avr8.h:
 

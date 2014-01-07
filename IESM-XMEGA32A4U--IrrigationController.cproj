@@ -501,15 +501,18 @@
     <None Include="src\config\conf_sleepmgr.h">
       <SubType>compile</SubType>
     </None>
-    <None Include="src\ASF\xmega\drivers\pmic\pmic.h">
+    <Compile Include="src\ASF\xmega\drivers\pmic\pmic.h">
       <SubType>compile</SubType>
-    </None>
+    </Compile>
     <Compile Include="src\ASF\xmega\drivers\rtc\rtc.c">
       <SubType>compile</SubType>
     </Compile>
     <None Include="src\ASF\xmega\drivers\rtc\rtc.h">
       <SubType>compile</SubType>
     </None>
+    <Compile Include="src\ASF\xmega\drivers\tc\interrupt.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\ASF\xmega\drivers\tc\tc.c">
       <SubType>compile</SubType>
     </Compile>
@@ -571,9 +574,6 @@
       <SubType>compile</SubType>
     </None>
     <None Include="src\ASF\common\boards\user_board\user_board.h">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="src\ASF\common\utils\interrupt.h">
       <SubType>compile</SubType>
     </None>
     <None Include="src\ASF\common\utils\interrupt\interrupt_avr8.h">

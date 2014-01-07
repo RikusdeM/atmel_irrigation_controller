@@ -2,7 +2,7 @@ src/ASF/xmega/drivers/tc/tc.d src/ASF/xmega/drivers/tc/tc.o: \
  ../src/ASF/xmega/drivers/tc/tc.c \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/include/stdint.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/stdint.h \
- ../src/ASF/common/utils/interrupt.h ../src/ASF/common/utils/parts.h \
+ ../src/ASF/xmega/drivers/tc/interrupt.h ../src/ASF/common/utils/parts.h \
  ../src/ASF/common/utils/interrupt/interrupt_avr8.h \
  ../src/ASF/xmega/utils/compiler.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/io.h \
@@ -26,6 +26,7 @@ src/ASF/xmega/drivers/tc/tc.d src/ASF/xmega/drivers/tc/tc.o: \
  ../src/ASF/xmega/utils/preprocessor/preprocessor.h \
  ../src/ASF/xmega/utils/progmem.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/pgmspace.h \
+ ../src/ASF/xmega/drivers/tc/interrupt.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/interrupt.h \
  ../src/ASF/xmega/drivers/tc/tc.h ../src/ASF/xmega/utils/status_codes.h \
  ../src/ASF/xmega/drivers/pmic/pmic.h ../src/ASF/xmega/drivers/cpu/ccp.h \
@@ -46,7 +47,7 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/stdint.h:
 
-../src/ASF/common/utils/interrupt.h:
+../src/ASF/xmega/drivers/tc/interrupt.h:
 
 ../src/ASF/common/utils/parts.h:
 
@@ -95,6 +96,8 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8
 ../src/ASF/xmega/utils/progmem.h:
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/pgmspace.h:
+
+../src/ASF/xmega/drivers/tc/interrupt.h:
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.2.1002\avr8-gnu-toolchain\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/avr/interrupt.h:
 
