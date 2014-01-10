@@ -1561,33 +1561,50 @@ void ack_job(int job_no)
 
 void pwm_toggle(int channel, bool on, int duty, int frequency)
 {
-    struct pwm_config pwm_cfg;
+    struct pwm_config pwm_cfg_A;
+    struct pwm_config pwm_cfg_B;
+    struct pwm_config pwm_cfg_C;
+    struct pwm_config pwm_cfg_D;
     switch (channel) {
     case 0: {
-        pwm_init(&pwm_cfg, PWM_TCD0, PWM_CH_A, frequency); // PWM output channel 0
+        pwm_init(&pwm_cfg_A, PWM_TCD0, PWM_CH_A, frequency); // PWM output channel 0
+        if (on == true) {
+            pwm_start(&pwm_cfg_A, duty); //duty
+        } else {
+            pwm_stop(&pwm_cfg_A);
+        }
         break;
     }
     case 1: {
-        pwm_init(&pwm_cfg, PWM_TCD0, PWM_CH_B, frequency); // PWM output channel 1
+        pwm_init(&pwm_cfg_B, PWM_TCD0, PWM_CH_B, frequency); // PWM output channel 1
+        if (on == true) {
+            pwm_start(&pwm_cfg_B, duty); //duty
+        } else {
+            pwm_stop(&pwm_cfg_B);
+        }
         break;
     }
     case 2: {
-        pwm_init(&pwm_cfg, PWM_TCD0, PWM_CH_C, frequency); // PWM output channel 2
+        pwm_init(&pwm_cfg_C, PWM_TCD0, PWM_CH_C, frequency); // PWM output channel 2
+        if (on == true) {
+            pwm_start(&pwm_cfg_C, duty); //duty
+        } else {
+            pwm_stop(&pwm_cfg_C);
+        }
         break;
     }
 
     case 3: {
-        pwm_init(&pwm_cfg, PWM_TCD0, PWM_CH_D, frequency); // PWM output channel 3
+        pwm_init(&pwm_cfg_D, PWM_TCD0, PWM_CH_D, frequency); // PWM output channel 3
+        if (on == true) {
+            pwm_start(&pwm_cfg_D, duty); //duty
+        } else {
+            pwm_stop(&pwm_cfg_D);
+        }
         break;
     }
 
     }//switch
-
-    if (on == true) {
-        pwm_start(&pwm_cfg, duty); //duty
-    } else {
-        pwm_stop(&pwm_cfg);
-    }
 
     return 0;
 }
@@ -1893,13 +1910,14 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
             array_pos++;
         }//if
     }//for
-    int_to_binary(job_value, bin_array_pass);
-    current_time = rtc_get_time();
 
-    if (job_value < 0) {
+    if (job_value < 0) { //if signed int32 value has overrun, then it is modified to represent the correct binary value
         uint32_t temp_value = -1 * job_value + 2147483648;
         job_value = temp_value;
     }
+
+    int_to_binary(job_value, bin_array_pass);
+    current_time = rtc_get_time();
 
     if (asset == "ICA1_ts0") {
         timeslot_offset = 0;
@@ -1917,12 +1935,12 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
                 }
                 if (current_time  >= start_time && current_time <= (start_time + 60)) {
                     //start pwm method
-                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    DEBUG_puts("!!!start pwm method-ICA1_ts0!!! \n \r");
                     pwm_toggle(0, true, 10, 10);
                 }
                 if (current_time >= end_time && current_time <= (end_time + 60)) {
                     if (next_job == false) {
-                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        DEBUG_puts("!!!end pwm method-ICA1_ts0!!! \n \r"); //////////complete for all ifs
                         pwm_toggle(0, false, 0, 0);
                     }
                 }
@@ -1946,12 +1964,12 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
                 }
                 if (current_time  >= start_time && current_time <= (start_time + 60)) {
                     //start pwm method
-                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    DEBUG_puts("!!!start pwm method-ICA1_ts1!!! \n \r");
                     pwm_toggle(0, true, 10, 10);
                 }
                 if (current_time >= end_time && current_time <= (end_time + 60)) {
                     if (next_job == false) {
-                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        DEBUG_puts("!!!end pwm method-ICA1_ts1!!! \n \r"); //////////complete for all ifs
                         pwm_toggle(0, false, 0, 0);
                     }
                 }
@@ -1975,12 +1993,12 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
                 }
                 if (current_time  >= start_time && current_time <= (start_time + 60)) {
                     //start pwm method
-                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    DEBUG_puts("!!!start pwm method-ICA1_ts2!!! \n \r");
                     pwm_toggle(0, true, 10, 10);
                 }
                 if (current_time >= end_time && current_time <= (end_time + 60)) {
                     if (next_job == false) {
-                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        DEBUG_puts("!!!end pwm method-ICA1_ts2!!! \n \r"); //////////complete for all ifs
                         pwm_toggle(0, false, 0, 0);
                     }
                 }
@@ -2004,12 +2022,12 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
                 }
                 if (current_time  >= start_time && current_time <= (start_time + 60)) {
                     //start pwm method
-                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    DEBUG_puts("!!!start pwm method-ICA2_ts0!!! \n \r");
                     pwm_toggle(1, true, 10, 10);
                 }
                 if (current_time >= end_time && current_time <= (end_time + 60)) {
                     if (next_job == false) {
-                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        DEBUG_puts("!!!end pwm method-ICA2_ts0!!! \n \r"); //////////complete for all ifs
                         pwm_toggle(1, false, 0, 0);
                     }
                 }
@@ -2033,12 +2051,12 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
                 }
                 if (current_time  >= start_time && current_time <= (start_time + 60)) {
                     //start pwm method
-                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    DEBUG_puts("!!!start pwm method-ICA2_ts1!!! \n \r");
                     pwm_toggle(1, true, 10, 10);
                 }
                 if (current_time >= end_time && current_time <= (end_time + 60)) {
                     if (next_job == false) {
-                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        DEBUG_puts("!!!end pwm method-ICA2_ts1!!! \n \r"); //////////complete for all ifs
                         pwm_toggle(1, false, 0, 0);
                     }
                 }
@@ -2062,12 +2080,12 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
                 }
                 if (current_time  >= start_time && current_time <= (start_time + 60)) {
                     //start pwm method
-                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    DEBUG_puts("!!!start pwm method-ICA2_ts2!!! \n \r");
                     pwm_toggle(1, true, 10, 10);
                 }
                 if (current_time >= end_time && current_time <= (end_time + 60)) {
                     if (next_job == false) {
-                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        DEBUG_puts("!!!end pwm method-ICA2_ts2!!! \n \r"); //////////complete for all ifs
                         pwm_toggle(1, false, 0, 0);
                     }
                 }
@@ -2091,12 +2109,12 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
                 }
                 if (current_time  >= start_time && current_time <= (start_time + 60)) {
                     //start pwm method
-                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    DEBUG_puts("!!!start pwm method-ICA3_ts0!!! \n \r");
                     pwm_toggle(3, true, 10, 10);
                 }
                 if (current_time >= end_time && current_time <= (end_time + 60)) {
                     if (next_job == false) {
-                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        DEBUG_puts("!!!end pwm method-ICA3_ts0!!! \n \r"); //////////complete for all ifs
                         pwm_toggle(3, false, 0, 0);
                     }
                 }
@@ -2120,12 +2138,12 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
                 }
                 if (current_time  >= start_time && current_time <= (start_time + 60)) {
                     //start pwm method
-                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    DEBUG_puts("!!!start pwm method-ICA3_ts1!!! \n \r");
                     pwm_toggle(3, true, 10, 10);
                 }
                 if (current_time >= end_time && current_time <= (end_time + 60)) {
                     if (next_job == false) {
-                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        DEBUG_puts("!!!end pwm method-ICA3_ts1!!! \n \r"); //////////complete for all ifs
                         pwm_toggle(3, false, 0, 0);
                     }
                 }
@@ -2149,12 +2167,12 @@ void execute_jobs(char* scheduled_char_time_ptr, int8_t size, char* asset)
                 }
                 if (current_time  >= start_time && current_time <= (start_time + 60)) {
                     //start pwm method
-                    DEBUG_puts("!!!!!!!!!!!!!!start pwm method!!!!!!!!!!!!! \n \r");
+                    DEBUG_puts("!!!start pwm method-ICA3_ts2!!! \n \r");
                     pwm_toggle(3, true, 10, 10);
                 }
                 if (current_time >= end_time && current_time <= (end_time + 60)) {
                     if (next_job == false) {
-                        DEBUG_puts("!!!!!!!!!!!!!!end pwm method!!!!!!!!!!!!!!! \n \r"); //////////complete for all ifs
+                        DEBUG_puts("!!!end pwm method-ICA3_ts2!!! \n \r"); //////////complete for all ifs
                         pwm_toggle(3, false, 0, 0);
                     }
                 }
@@ -2337,6 +2355,7 @@ int main(void)
     uint32_t dummy_timer;
     uint32_t rtc_timer;
     uint32_t look_for_jobs_timer;
+    uint32_t system_time_timer; //
 
     MODEM_raw_puts("at+awtda=c*");
     MODEM_raw_putb('\r');
@@ -2389,6 +2408,13 @@ int main(void)
         if (rtc_get_time() - look_for_jobs_timer >= 20) {
             look_for_jobs();
             look_for_jobs_timer = rtc_get_time(); //update timer
+        }
+        if (rtc_get_time() - system_time_timer >= 60) { //update system time every minute
+            MODEM_raw_puts(RTC_TIME);
+            MODEM_raw_putb('\r');
+            MODEM_raw_putb('\n');
+            delay_s(1.5);
+            system_time_timer = rtc_get_time(); //update timer
         }
     }//while(1)
     return 0;
