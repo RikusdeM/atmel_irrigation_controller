@@ -2356,6 +2356,7 @@ int main(void)
     uint32_t rtc_timer;
     uint32_t look_for_jobs_timer;
     uint32_t system_time_timer; //
+    uint32_t command_timer; //
 
     MODEM_raw_puts("at+awtda=c*");
     MODEM_raw_putb('\r');
@@ -2415,6 +2416,18 @@ int main(void)
             MODEM_raw_putb('\n');
             delay_s(1.5);
             system_time_timer = rtc_get_time(); //update timer
+        }
+
+        if (rtc_get_time() - command_timer >= 300) { //ensure commands/data are enabled every 5 minutes
+            MODEM_raw_puts("at+awtda=c*");
+            MODEM_raw_putb('\r');
+            MODEM_raw_putb('\n');
+            delay_s(1.5);
+            MODEM_raw_puts("at+awtda=d*");
+            MODEM_raw_putb('\r');
+            MODEM_raw_putb('\n');
+            delay_s(1.5);
+            command_timer = rtc_get_time(); //update timer
         }
     }//while(1)
     return 0;
